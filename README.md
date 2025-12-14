@@ -234,27 +234,27 @@ Adjust in `main.c`:
 
 **Requirements:**
 - 1000 concurrent audio streams
-- 1 minute buffering per stream
+- 0.5 sec buffering per stream
 - 8 KHz, 16-bit, mono PCM audio
 
 **Calculation:**
 ```
-Samples/minute = 8000 Hz × 60 sec = 480,000 samples
-Bytes = 480,000 × 2 bytes/sample = 960,000 bytes
-Buffer size (power of 2) = 1,048,576 bytes (1 MB)
+Samples/minute = 8000 Hz × 0.5 sec = 4000 samples
+Bytes = 4000 × 2 bytes/sample = 8000 bytes
+Buffer size (power of 2) = 8192 bytes = KiB
 ```
 
 **Code:**
 ```c
 queue_pool_t pool;
-queue_pool_init(&pool, 1000, 1048576, -1);  // 1000 queues × 1MB each
+queue_pool_init(&pool, 1000, 8192, -1);  // 1000 queues × 8192B each
 ```
 
 **Memory footprint:**
-- Physical RAM: **1 GB** (1000 × 1 MB buffers)
-- Virtual address space: **2 GB** (mirrored mapping)
+- Physical RAM: **2 MB** (1000 × 2 KB buffers)
+- Virtual address space: **4 MB** (mirrored mapping)
 - Metadata: **132 KB** (queue_t structs + free list)
-- Total: **~1 GB physical memory**
+- Total: **~2MB physical memory**
 
 **Performance benefit:**
 - Buffers allocated once at startup
